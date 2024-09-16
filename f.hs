@@ -2,8 +2,13 @@ data Trie a = TrieNodo (Maybe a) [(Char, Trie a)] deriving (Eq , Show)
 type Procesador a b = a -> [b]
 data RoseTree a = Rose a [RoseTree a] deriving (Eq,Show)
 data AT a = Nil | Tern a (AT a) (AT a) (AT a) deriving (Eq,Show)
+
+
+
+
+
 sufijos :: Procesador [a] [a]
-sufijos  = foldr(\x acc -> (x : head acc) : acc) [[]] 
+sufijos  = foldr (\x acc -> (x : head acc) : acc) [[]]
 
 
 foldRT :: (a -> [b] -> b) -> RoseTree a -> b
@@ -12,14 +17,14 @@ foldRT fRose (Rose n hijos) = fRose n (map rec hijos)
 
 foldAT :: (a -> b -> b -> b -> b) -> b -> AT a -> b
 foldAT f b Nil = b
-foldAT f b (Tern a iz cent der) = f a (rec iz) (rec cent) (rec der)
- where 
+foldAT f b (Tern a ri rc rd) = f a (rec ri) (rec rc) (rec rd)
+ where
     rec = foldAT f b
 
 foldTrie :: (Maybe a -> [(Char, b)] -> b) -> Trie a -> b
 foldTrie f (TrieNodo x list) = f x (map onlyTrie list)
- where 
-    onlyTrie (a,b) = (a, foldTrie f b) 
+ where
+    onlyTrie (a,b) = (a, foldTrie f b)
 
 unoxuno :: Procesador [a] [a]  -- lambda
 unoxuno = map (: [])  -- esto espera el a para pegarlo a una lista. 
@@ -43,14 +48,14 @@ testTree = Tern 16
 
 
 test2Tree :: RoseTree Int
-test2Tree = Rose 1 
-                  [ Rose 2 
-                      [ Rose 4 [] 
-                      , Rose 5 [] 
+test2Tree = Rose 1
+                  [ Rose 2
+                      [ Rose 4 []
+                      , Rose 5 []
                       ]
-                  , Rose 3 
-                      [ Rose 6 [] 
-                      , Rose 7 
+                  , Rose 3
+                      [ Rose 6 []
+                      , Rose 7
                           [ Rose 8 []
                           , Rose 9 []
                           ]
@@ -60,23 +65,40 @@ main :: IO ()
 main = print (preorderRose test2Tree)
 
 preorder :: Procesador (AT a) a -- lambda
-preorder  = foldAT(\x iz cen der -> x : concat [iz,cen,der]) []
+preorder  = foldAT (\x ri rc rd -> x : concat [ri, rc, rd]) []
 
 postorder :: Procesador (AT a) a -- lambda
-postorder = foldAT(\x iz cen der -> concat [iz,cen,der,[x]]) []
+postorder = foldAT (\x ri rc rd -> concat [ri, rc, rd, [x]]) []
 
-inorder :: Procesador (AT a) a 
-inorder = foldAT(\x iz cen der -> concat [iz,cen ++ [x],der]) []
+inorder :: Procesador (AT a) a
+inorder = foldAT (\x ri rc rd -> concat [ri, rc ++ [x], rd]) []
 
 -- ej 5)
 
 preorderRose :: Procesador (RoseTree a) a
-preorderRose = foldRT(\x acc -> x : concat acc)   
-                                      
+preorderRose = foldRT (\x rec -> x : concat rec)
+
 ramasRose :: Procesador (RoseTree a) [a]
-ramasRose = foldRT(\x acc -> case acc of 
+ramasRose = foldRT (\x rec -> case rec of
                                 [] -> [[x]]
-                                _ -> map (x : ) (concat acc))  
+                                _ -> map (x : ) (concat rec))
 
 -- 6)
-caminos 
+-- caminos t ⇝ ["", "a", "b", "ba", "bad", "c"]
+
+caminos :: Procesador (Trie a) [String]
+caminos = foldTrie (\x rec -> case rec of
+                        [] -> [[]]
+                        _ -> concatMap (agregarElemento x) rec
+            )
+agregarElemento :: a -> [[a]] -> [[a]]
+agregarElemento x = map (x:)
+
+
+
+-- 8)
+ifProc :: (a->Bool) -> Procesador a b -> Procesador a b -> Procesador a b
+
+
+
+ifProc cond p1 p2 estructura = if cond estructura then p1 else p2
