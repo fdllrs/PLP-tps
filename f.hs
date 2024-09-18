@@ -86,13 +86,15 @@ ramasRose = foldRT (\x rec -> case rec of
 -- 6)
 -- caminos t ⇝ ["", "a", "b", "ba", "bad", "c"]
 
-caminos :: Procesador (Trie a) [String]
-caminos = foldTrie (\x rec -> case rec of
-                        [] -> [[]]
-                        _ -> concatMap (agregarElemento x) rec
-            )
-agregarElemento :: a -> [[a]] -> [[a]]
-agregarElemento x = map (x:)
+caminos :: Procesador (Trie a) String
+caminos = foldTrie (\_ rec -> "": concatMap (\(c, rec2)-> map ([c] ++) rec2) rec)
+
+
+--7)
+palabras :: Procesador (Trie a) String
+palabras = foldTrie (\m rec -> case m of
+                        Nothing -> concatMap (\(c, rec2)-> map ([c] ++) rec2) rec
+                        Just x  -> "":concatMap (\(c, rec2)-> map ([c] ++) rec2) rec)
 
 
 
