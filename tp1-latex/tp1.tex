@@ -28,10 +28,9 @@
 \subsection*{Enunciado}
 De acuerdo a las definiciones de las funciones para árboles ternarios de más arriba, se pide
 demostrar lo siguiente: \\
-\begin{equation}
+\begin{equation*}
 	\forall t :: \text{AT a . }\forall x :: \text{a . (elem x (preorder t) = elem x (postorder t))} 
-	\label{eq1}
-\end{equation}
+\end{equation*}
 
 \subsection*{Definiciones}
 \noindent
@@ -40,7 +39,7 @@ $elem$ :: Eq a  $\implies$ a $\rightarrow$ [a] $\rightarrow$ Bool \\
 \{E1\} elem e (x:xs) = (e == x) $||$ elem e xs \\
 \\
 $preorder$ :: Procesador (AT a) a \\
-\{PRE1\} preorder = foldAT ($\backslash$x ri rc rd $\rightarrow$ x : concat [ri, rc, rd]) [ ]\\
+\{PRE1\} preorder = foldAT ($\backslash$x ri rc rd $\rightarrow$ concat [[x], ri, rc, rd]) [ ]\\
 \\
 $postorder$ :: Procesador (AT a) a \\
 \{POST1\} postorder = foldAT ($\backslash$x ri rc rd $\rightarrow$ concat [ri, rc, rd, [x]]) [ ]\\
@@ -78,10 +77,21 @@ P(Tern a h1 h2 h3) = elem x (preorder (Tern a h1 h2 h3)) = elem x (postorder (Te
 elem x (postorder (Tern a h1 h2 h3)) $\underset{\{POST1\}}{=}$ elem x (foldAT ($\backslash$x r1 rc rd $\rightarrow$ concat [ri, rc, rd, [x]]) []) (Tern a h1 h2 h3)
 considero f = ($\backslash$x r1 rc rd $\rightarrow$ concat [r1, rc, rd, [x]]) para facilitar la lectura.\\ \\
 $\underset{\{F1\}}{=}$ elem x ((f a (foldAT f [] r1) (foldAT f [] rc) (foldAT f [] rd)) (Tern a h1 h2 h3)) \\
-$\underset{aplico}{=}$ elem x (f a (foldAT f [] h1) (foldAT f [] h2) (foldAT f [] h3)) \\
+$\underset{aplico}{=}$ elem x (($\backslash$x r1 rc rd $\rightarrow$ concat [r1, rc, rd, [x]]) a (foldAT f [] h1) (foldAT f [] h2) (foldAT f [] h3)) \\
+$\underset{aplico}{=}$ elem x (concat [(foldAT f [] h1), (foldAT f [] h2), (foldAT f [] h3), [a]]) \\
 
-
-
-
+utilizando el siguiente lema : elem x (concat [a,b,c,d]) = elem x a $||$ elem x b $||$ elem x c $||$ elem x d \\
+\\
+\noindent
+$\underset{\{lema\}}{=}$ elem x (foldAT f [] h1) $||$ elem x (foldAT f [] h2) $||$ elem x (foldAT f [] h3) $||$ elem x [a] \\
+$\underset{\{POST1\}}{=}$ elem x (postorder h1) $||$ elem x (postorder h2) $||$ elem x (postorder h3) $||$ elem x [a] \\
+$\underset{\{HI's\}}{=}$ elem x (preorder h1) $||$ elem x (preorder h2) $||$ elem x (preorder h3) $||$ elem x [a] \\
+reordeno los términos \\
+= elem x [a] $||$ elem x (preorder h1) $||$ elem x (preorder h2) $||$ elem x (preorder h3)  \\
+$\underset{\{lema\}}{=}$ elem x concat [[a], (preorder h1), (preorder h2), (preorder h3)]  \\
+$\underset{\{des-aplico\}}{=}$ elem x (foldAT ($\backslash$x ri rc rd $\rightarrow$ concat [[x], (preorder ri), (preorder rc), (preorder rd)]) (Tern a h1 h2 h3))  \\
+$\underset{\{PRE1\}}{=}$ elem x (preorder (Tern a h1 h2 h3))  \\
+\\
+Entonces, mediante una cadena de igualdades, concluyo que: elem x (preorder (Tern a h1 h2 h3)) = elem x (postorder (Tern a h1 h2 h3)), que es lo que quería probar.
 
 \end{document}
