@@ -170,6 +170,9 @@ ifProc cond proc1 proc2 struct = if cond struct then proc1 struct else proc2 str
 -- Ejercicio 9
 -- elem x foldAT (\x r1 rc rd -> r1 ++ rc ++ rd ++ [x]) [] (Tern a h1 h2 h3)
 -- elem x a (\x r1 rc rd -> concat [r1, rc, rd, [x]]) a (foldAT f b h1) (foldAT f b h2) (foldAT f b h3)
+
+
+
 -- elem x (concat [(foldAT f b h1), (foldAT f b h2), (foldAT f b h3), [a]])
 
 -- lema : elem x (concat [a,b,c,d]) = elem x a || elem x b || elem x c || elem x d

@@ -1,0 +1,87 @@
+\documentclass[10pt,a4paper]{article}
+
+\input{AEDmacros}
+\usepackage{caratula} % Version modificada para usar las macros de algo1 de ~> https://github.com/bcardiff/dc-tex
+\usepackage[dvipsnames]{xcolor}
+\usepackage{amsmath}
+
+\titulo{Trabajo práctico 1}
+\subtitulo{Programación Funcional}
+
+\fecha{\today}
+
+\materia{Paradigmas de Programación}
+\grupo{Grupo CHAD sociedad anónima}
+
+
+\integrante{Condori Llanos, Alex}{163/23}{nocwe11@gmail.com}
+\integrante{Della Rosa, Facundo César}{1317/23}{dellarosafacundo@gmail.com}
+\integrante{López Porto, Gregorio}{1376/23}{gregoriolopezporto@gmail.com}
+\integrante{Winogron, Iván}{459/23}{Ivowino2000@gmail.com}
+\begin{document}
+
+
+\maketitle
+
+
+\section*{Ejercicio 9}
+\subsection*{Enunciado}
+De acuerdo a las definiciones de las funciones para árboles ternarios de más arriba, se pide
+demostrar lo siguiente: \\
+\begin{equation}
+	\forall t :: \text{AT a . }\forall x :: \text{a . (elem x (preorder t) = elem x (postorder t))} 
+	\label{eq1}
+\end{equation}
+
+\subsection*{Definiciones}
+\noindent
+$elem$ :: Eq a  $\implies$ a $\rightarrow$ [a] $\rightarrow$ Bool \\
+\{E0\} elem e [ ] = False \\
+\{E1\} elem e (x:xs) = (e == x) $||$ elem e xs \\
+\\
+$preorder$ :: Procesador (AT a) a \\
+\{PRE1\} preorder = foldAT ($\backslash$x ri rc rd $\rightarrow$ x : concat [ri, rc, rd]) [ ]\\
+\\
+$postorder$ :: Procesador (AT a) a \\
+\{POST1\} postorder = foldAT ($\backslash$x ri rc rd $\rightarrow$ concat [ri, rc, rd, [x]]) [ ]\\
+\\
+$foldAT :: (a \rightarrow b \rightarrow b \rightarrow b \rightarrow b) \rightarrow b \rightarrow AT a \rightarrow b $\\
+\{F0\} foldAT f b Nil = b\\
+\{F1\} foldAT f b (Tern a ri rc rd) = f a (foldAT f b ri) (foldAT f b rc) (foldAT f b rd) \\
+
+\subsection*{Demostración (esqueleto, faltaría formalizar y emprolijar)}
+\noindent
+Por inducción estructural en t\\
+P(t) = elem x (preorder t) = elem x (postorder t) \\ \\
+Caso base: P(Nil) = elem x (preorder Nil) = elem x (postorder Nil)\\ \\
+elem x (preorder Nil) $\underset{\{PRE1\}}{=}$ elem x (foldAT ($\backslash$x ri rc rd $\rightarrow$ x : concat [ri, rc, rd]) [ ] Nil) $\underset{\{F0\}}{=}$ elem x [ ] \\
+
+\noindent análogamente: \\
+elem x (postorder Nil) $\underset{\{POST1\}}{=}$ elem x (foldAT ($\backslash$x ri rc rd $\rightarrow$ concat [ri, rc, rd, [x]]) [ ] Nil) $\underset{\{F0\}}{=}$ elem x [ ] \\
+
+
+Luego vale el caso base P(Nil)
+\\ \\
+Paso inductivo: 
+\begin{center}
+	$\forall$ h1 :: AT a, $\forall$h2 :: AT a, $\forall$h3 :: AT a, $\forall$r :: a, \\
+	P(h1) $\land$ P(h2) $\land$ P(h3) $\land$ $\implies$ P(Tern a h1 h2 h3)
+\end{center}
+Es decir, supongo que valen P(h1), P(h2), P(h3) y quiero ver que vale P(Tern a h1 h2 h3) \\
+P(h1) = elem x (preorder h1) = elem x (postorder h1) \\
+P(h2) = elem x (preorder h2) = elem x (postorder h2) \\
+P(h3) = elem x (preorder h3) = elem x (postorder h3) \\
+P(Tern a h1 h2 h3) = elem x (preorder (Tern a h1 h2 h3)) = elem x (postorder (Tern a h1 h2 h3)) \\
+\\
+\noindent
+
+elem x (postorder (Tern a h1 h2 h3)) $\underset{\{POST1\}}{=}$ elem x (foldAT ($\backslash$x r1 rc rd $\rightarrow$ concat [ri, rc, rd, [x]]) []) (Tern a h1 h2 h3)
+considero f = ($\backslash$x r1 rc rd $\rightarrow$ concat [r1, rc, rd, [x]]) para facilitar la lectura.\\ \\
+$\underset{\{F1\}}{=}$ elem x ((f a (foldAT f [] r1) (foldAT f [] rc) (foldAT f [] rd)) (Tern a h1 h2 h3)) \\
+$\underset{aplico}{=}$ elem x (f a (foldAT f [] h1) (foldAT f [] h2) (foldAT f [] h3)) \\
+
+
+
+
+
+\end{document}

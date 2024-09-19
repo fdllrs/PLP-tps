@@ -1,0 +1,40 @@
+*
+!*/
+*.Rcheck/
+**/__pycache__/
+
+########################
+# Archivos que NO ignora
+
+!LICENSE
+!license
+
+## Latex
+!*.tex
+*-concordance.tex
+!*.bib
+!*.bst
+!*.sty
+!*.cls
+
+## Codigo
+!*.jl
+!*.py
+!*.R
+!*.c
+!*.sql
+!*.sh
+!*.hs
+!*.jar
+
+## Texto
+!*.md
+!*.txt
+!*.pdf
+!*.jpg
+
+## Otros
+!makefile
+!Makefile
+!.keep
+!.gitignore
