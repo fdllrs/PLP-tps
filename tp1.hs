@@ -118,20 +118,22 @@ sufijos = foldr (\x acc -> (x : head acc) : acc) [[]]
 
 -- Ejercicio 4
 preorder :: Procesador (AT a) a
-preorder = foldAT (\x ri rc rd -> x : concat [ri, rc, rd]) []
+preorder = foldAT (\x ri rc rd -> [x ++ ri ++ rc ++ rd]) []
 
 postorder :: Procesador (AT a) a
-postorder = foldAT (\x ri rc rd -> concat [ri, rc, rd, [x]]) []
+postorder = foldAT (\x ri rc rd -> [ri ++ rc ++ rd ++ [x]]) []
 
 inorder :: Procesador (AT a) a
-inorder = foldAT (\x ri rc rd -> concat [ri, rc ++ [x], rd]) []
+inorder = foldAT (\x ri rc rd -> [ri ++ rc ++ [x] ++ rd]) []
 
 -- Ejercicio 5
 preorderRose :: Procesador (RoseTree a) a
 preorderRose = foldRose (\x rec -> x : concat rec)
 
 hojasRose :: Procesador (RoseTree a) a
-hojasRose = undefined
+hojasRose = foldRT (\x acc -> case acc of
+                                [] -> [x]
+                                _ -> concat acc)
 
 ramasRose :: Procesador (RoseTree a) [a]
 ramasRose =
