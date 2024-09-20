@@ -4,7 +4,7 @@
 \usepackage{caratula} % Version modificada para usar las macros de algo1 de ~> https://github.com/bcardiff/dc-tex
 \usepackage[dvipsnames]{xcolor}
 \usepackage{amsmath}
-
+\linespread{1.3}
 \titulo{Trabajo práctico 1}
 \subtitulo{Programación Funcional}
 
@@ -27,7 +27,7 @@
 \section*{Ejercicio 9}
 \subsection*{Enunciado}
 De acuerdo a las definiciones de las funciones para árboles ternarios de más arriba, se pide
-demostrar lo siguiente: \\
+demostrar lo siguiente:
 \begin{equation*}
 	\forall t :: \text{AT a . }\forall x :: \text{a . (elem x (preorder t) = elem x (postorder t))} 
 \end{equation*}
@@ -39,59 +39,99 @@ $elem$ :: Eq a  $\implies$ a $\rightarrow$ [a] $\rightarrow$ Bool \\
 \{E1\} elem e (x:xs) = (e == x) $||$ elem e xs \\
 \\
 $preorder$ :: Procesador (AT a) a \\
-\{PRE1\} preorder = foldAT ($\backslash$x ri rc rd $\rightarrow$ concat [[x], ri, rc, rd]) [ ]\\
+\{PRE1\} preorder = foldAT ($\backslash$x ri rc rd $\rightarrow$ [x] ++ ri ++ rc ++ rd) [ ]\\
 \\
 $postorder$ :: Procesador (AT a) a \\
-\{POST1\} postorder = foldAT ($\backslash$x ri rc rd $\rightarrow$ concat [ri, rc, rd, [x]]) [ ]\\
+\{POST1\} postorder = foldAT ($\backslash$x ri rc rd $\rightarrow$ ri ++ rc ++ rd ++ [x]) [ ]\\
 \\
 $foldAT :: (a \rightarrow b \rightarrow b \rightarrow b \rightarrow b) \rightarrow b \rightarrow AT a \rightarrow b $\\
 \{F0\} foldAT f b Nil = b\\
-\{F1\} foldAT f b (Tern a ri rc rd) = f a (foldAT f b ri) (foldAT f b rc) (foldAT f b rd) \\
+\{F1\} foldAT f b (Tern r ri rc rd) = f a (foldAT f b ri) (foldAT f b rc) (foldAT f b rd)
 
-\subsection*{Demostración (esqueleto, faltaría formalizar y emprolijar)}
+\subsection*{Demostración}
+Hacemos la demostración utilizando inducción estructural en el arbol ternario t. Sea P(t) la propiedad:
+\begin{center}
+	P(t) = elem x (preorder t) = elem x (postorder t)
+\end{center}
+Primero pruebo la propiedad para el caso base: 
+\begin{center}
+	P(Nil) = elem x (preorder Nil) = elem x (postorder Nil)
+\end{center}
+elem x (preorder Nil) $\underset{\{PRE1\}}{=}$ elem x (foldAT ($\backslash$x ri rc rd $\rightarrow$ [x] ++ ri ++ rc ++ rd) [ ] Nil) $\underset{\{F0\}}{=}$ elem x [ ] \\
+elem x (postorder Nil) $\underset{\{POST1\}}{=}$ elem x (foldAT ($\backslash$x ri rc rd $\rightarrow$ concat ri ++ rc ++ rd ++ [x]) [ ] Nil) $\underset{\{F0\}}{=}$ elem x [ ] \\
+
 \noindent
-Por inducción estructural en t\\
-P(t) = elem x (preorder t) = elem x (postorder t) \\ \\
-Caso base: P(Nil) = elem x (preorder Nil) = elem x (postorder Nil)\\ \\
-elem x (preorder Nil) $\underset{\{PRE1\}}{=}$ elem x (foldAT ($\backslash$x ri rc rd $\rightarrow$ x : concat [ri, rc, rd]) [ ] Nil) $\underset{\{F0\}}{=}$ elem x [ ] \\
-
-\noindent análogamente: \\
-elem x (postorder Nil) $\underset{\{POST1\}}{=}$ elem x (foldAT ($\backslash$x ri rc rd $\rightarrow$ concat [ri, rc, rd, [x]]) [ ] Nil) $\underset{\{F0\}}{=}$ elem x [ ] \\
-
-
-Luego vale el caso base P(Nil)
-\\ \\
-Paso inductivo: 
+Entonces elem x (preorder Nil) = elem x (postorder Nil) = elem x [ ]. Luego vale la propiedad para el caso base P(Nil).
+\\
+Pruebo el paso inductivo: 
 \begin{center}
 	$\forall$ h1 :: AT a, $\forall$h2 :: AT a, $\forall$h3 :: AT a, $\forall$r :: a, \\
-	P(h1) $\land$ P(h2) $\land$ P(h3) $\land$ $\implies$ P(Tern a h1 h2 h3)
+	P(h1) $\land$ P(h2) $\land$ P(h3) $\land$ $\implies$ P(Tern r h1 h2 h3)
 \end{center}
-Es decir, supongo que valen P(h1), P(h2), P(h3) y quiero ver que vale P(Tern a h1 h2 h3) \\
+Defino las propiedades \\
 P(h1) = elem x (preorder h1) = elem x (postorder h1) \\
 P(h2) = elem x (preorder h2) = elem x (postorder h2) \\
 P(h3) = elem x (preorder h3) = elem x (postorder h3) \\
-P(Tern a h1 h2 h3) = elem x (preorder (Tern a h1 h2 h3)) = elem x (postorder (Tern a h1 h2 h3)) \\
-\\
+P(Tern r h1 h2 h3) = elem x (preorder (Tern r h1 h2 h3)) = elem x (postorder (Tern r h1 h2 h3)) \\
 \noindent
+Entonces, mi hipótesis inductiva es que valen las propiedades P(h1), P(h2), P(h3), y quiero ver que vale P(Tern r h1 h2 h3). \\
 
-elem x (postorder (Tern a h1 h2 h3)) $\underset{\{POST1\}}{=}$ elem x (foldAT ($\backslash$x r1 rc rd $\rightarrow$ concat [ri, rc, rd, [x]]) []) (Tern a h1 h2 h3)
-considero f = ($\backslash$x r1 rc rd $\rightarrow$ concat [r1, rc, rd, [x]]) para facilitar la lectura.\\ \\
-$\underset{\{F1\}}{=}$ elem x ((f a (foldAT f [] r1) (foldAT f [] rc) (foldAT f [] rd)) (Tern a h1 h2 h3)) \\
-$\underset{aplico}{=}$ elem x (($\backslash$x r1 rc rd $\rightarrow$ concat [r1, rc, rd, [x]]) a (foldAT f [] h1) (foldAT f [] h2) (foldAT f [] h3)) \\
-$\underset{aplico}{=}$ elem x (concat [(foldAT f [] h1), (foldAT f [] h2), (foldAT f [] h3), [a]]) \\
-
-utilizando el siguiente lema : elem x (concat [a,b,c,d]) = elem x a $||$ elem x b $||$ elem x c $||$ elem x d \\
-\\
 \noindent
-$\underset{\{lema\}}{=}$ elem x (foldAT f [] h1) $||$ elem x (foldAT f [] h2) $||$ elem x (foldAT f [] h3) $||$ elem x [a] \\
-$\underset{\{POST1\}}{=}$ elem x (postorder h1) $||$ elem x (postorder h2) $||$ elem x (postorder h3) $||$ elem x [a] \\
-$\underset{\{HI's\}}{=}$ elem x (preorder h1) $||$ elem x (preorder h2) $||$ elem x (preorder h3) $||$ elem x [a] \\
-reordeno los términos \\
-= elem x [a] $||$ elem x (preorder h1) $||$ elem x (preorder h2) $||$ elem x (preorder h3)  \\
-$\underset{\{lema\}}{=}$ elem x concat [[a], (preorder h1), (preorder h2), (preorder h3)]  \\
-$\underset{\{des-aplico\}}{=}$ elem x (foldAT ($\backslash$x ri rc rd $\rightarrow$ concat [[x], (preorder ri), (preorder rc), (preorder rd)]) (Tern a h1 h2 h3))  \\
-$\underset{\{PRE1\}}{=}$ elem x (preorder (Tern a h1 h2 h3))  \\
+elem x (postorder (Tern r h1 h2 h3)) $\underset{\{POST1\}}{=}$ elem x (foldAT ($\backslash$x ri rc rd $\rightarrow$ ri ++ rc ++ rd ++ [x]) [ ]) (Tern r h1 h2 h3) \\
 \\
-Entonces, mediante una cadena de igualdades, concluyo que: elem x (preorder (Tern a h1 h2 h3)) = elem x (postorder (Tern a h1 h2 h3)), que es lo que quería probar.
+considero f = ($\backslash$x ri rc rd $\rightarrow$ ri ++ rc ++ rd ++ [x]) para facilitar la lectura.\\ 
+$\underset{\{F1\}}{=}$ elem x ((f a (foldAT f [ ] ri) (foldAT f [ ] rc) (foldAT f [ ] rd)) (Tern r h1 h2 h3)) \\
+$\underset{\beta\rightarrow}{=}$ elem x (($\backslash$x ri rc rd $\rightarrow$ ri ++ rc ++ rd ++ [x]) r (foldAT f [ ] h1) (foldAT f [ ] h2) (foldAT f [ ] h3))\\
+$\underset{\beta\rightarrow}{=}$ elem x ((foldAT f [ ] h1) ++ (foldAT f [ ] h2) ++ (foldAT f [ ] h3) ++ [r])\\
+
+\noindent
+Propongo el siguiente lema: 
+\begin{center}
+	$\forall$ a :: [z], $\forall$b :: [z], $\forall$c :: [z], $\forall$d :: [z], \\
+	elem x (a ++ b ++ c ++ d) = elem x a $||$ elem x b $||$ elem x c $||$ elem x d
+\end{center}
+\noindent
+considero g = ($\backslash$x ri rc rd $\rightarrow$ [x] ++ ri ++ rc ++ rd) para facilitar la lectura.\\ 
+$\underset{\{lema\}}{=}$ elem x (foldAT f [ ] h1) $||$ elem x (foldAT f [ ] h2) $||$ elem x (foldAT f [ ] h3) $||$ elem x [r] \\
+$\underset{\{POST1\}}{=}$ elem x (postorder h1) $||$ elem x (postorder h2) $||$ elem x (postorder h3) $||$ elem x [r] \\
+$\underset{\{HI's\}}{=}$ elem x (preorder h1) $||$ elem x (preorder h2) $||$ elem x (preorder h3) $||$ elem x [r] \\
+\\
+Utilizando la conmutatividad de la disyunción, cambio de lugar los términos \\
+= elem x [r] $||$ elem x (preorder h1) $||$ elem x (preorder h2) $||$ elem x (preorder h3)  \\
+$\underset{\{lema\}}{=}$ elem x ([r] ++ (preorder h1) ++ (preorder h2) ++ (preorder h3))  \\
+$\underset{\{\beta \leftarrow\}}{=}$ elem x (($\backslash$x ri rc rd $\rightarrow$ ([x] ++ ri ++ rc ++ rd)) r (foldAT g [ ] h1) (foldAT g [ ] h2) (foldAT g [ ] h3))  \\
+$\underset{\{\beta \leftarrow\}}{=}$ elem x ((g a (foldAT g [ ] ri) (foldAT g [ ] rc) (foldAT g [ ] rd)) (Tern r h1 h2 h3))  \\
+$\underset{\{PRE1\}}{=}$ elem x (preorder (Tern r h1 h2 h3))  \\
+Entonces, mediante una cadena de igualdades, concluyo que elem x (preorder (Tern r h1 h2 h3)) = elem x (postorder (Tern r h1 h2 h3)), que es lo que quería probar.
+\\ \\
+\noindent
+Demostración del lema elem x (a ++ b ++ c ++ d) = elem x a $||$ elem x b $||$ elem x c $||$ elem x d \\
+voy a demostrar primero una versión simplificada para luego demostrar el lema. \\
+llamo Q a la propiedad: elem x ($l_1$ ++ $l_2$) = elem x $l_1$ $||$ elem x $l_2$ \\
+Para demostrar que las funciones son iguales, basta con ver que 
+\begin{center}
+	$\forall$ $l_1$ :: [a], $\forall$$l_2$ :: [a] . elem x ($l_1$ ++ $l_2$) = elem x $l_1$ $||$ elem x $l_2$
+\end{center}
+Para la demostración voy a hacer inducción estructural sobre la lista $l_1$. \\
+caso base Q([]) = elem x ([] ++ $l_2$) $\underset{\{lista\}}{=}$ elem x $l_2$. \\
+por otro lado, elem x [] $||$ elem x $l_2$ $\underset{\{E0\}}{=}$ False $||$ elem x $l_2$ = elem x $l_2$ \\
+luego vale la propiedad Q para el caso base. Veo ahora el paso inductivo
+\begin{center}
+	$\forall$ ys :: [a], $\forall$y :: a . Q(ys) $\implies$ Q(y:ys)
+\end{center}
+defino las propiedades \\
+Q(ys) = elem x (ys ++ $l_2$) = elem x ys $||$ elem x $l_2$ \\
+Q(y:ys) = elem x ((y:ys) ++ $l_2$) = elem x y:ys $||$ elem x $l_2$ \\ \\
+Entonces, mi hipótesis inductiva es que vale la propiedad Q(ys) y mi objetivo es ver que vale Q(y:ys). \\
+elem x ((y:ys) ++ $l_2$) $\underset{\{E1\}}{=}$ x == y $||$ elem x (ys ++ $l_2$) $\underset{\{HI\}}{=}$ x == y $||$ elem x ys $||$ elem x $l_2$ \\
+= (x == y $||$ elem x ys) $||$ elem x $l_2$ $\underset{\{E1\}}{=}$ elem x (y:ys) $||$ elem x $l_2$ \\
+entonces vale la propiedad Q. \\
+Ahora para demostrar el lema, considero $l_1$ = a, $l_2$ = (b ++ c ++ d) y aplico la propiedad Q: \\
+elem x (a ++ b ++ c ++ d) $\underset{\{Q\}}{=}$ elem x a $||$ elem x (b ++ c ++ d) \\
+Siguiendo la misma lógica, considero $l_1$ = b, $l_2$ = (c ++ d) y aplico nuevamente la propiedad Q sobre el segundo término: \\
+elem x a $||$ elem x (b ++ c ++ d) $\underset{\{Q\}}{=}$ elem x a $||$ elem x b $||$ elem x (c ++ d) \\
+Aplico la propeidad Q nuevamente considerando $l_1$ = c, $l_2$ = d: \\
+elem x a $||$ elem x b $||$ elem x (c ++ d) $\underset{\{Q\}}{=}$ elem x a $||$ elem x b $||$ elem x c $||$ elem x d \\
+Luego, queda demostrado el lema elem x (a ++ b ++ c ++ d) = elem x a $||$ elem x b $||$ elem x c $||$ elem x d.
 
 \end{document}
