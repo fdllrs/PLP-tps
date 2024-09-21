@@ -586,9 +586,9 @@ testsEj8b =
 testsEj8c =
   test
     [ -- Casos de test para el ejercicio 8c
-      ((\z->[0..z]) .! map (+1)) [1,3] ~=? [0,1,2,0,1,2,3,4], -- caso gratis
+      ((\z->[0..z]) .! map (+1)) [1,3] ~=? [0,1,2,0,1,2,3,4], --caso gratis
       (procCola .! procVacio) testATNil ~=? [], -- caso vacio
-      (inorder .! procHijosAT) testAT4 ~=? , -- caso AT
-      (hojasRose .! procHijosRose) testRose3 ~=?, -- caso Rose
-      (palabras .! procSubTries) ~=?
-    ] -- faltan los rdos esperados
+      (inorder .! procHijosAT) testAT4 ~=? concatMap inorder (procHijosAT testAT4), -- caso AT
+      (hojasRose .! procHijosRose) testRose3 ~=? concatMap hojasRose (procHijosRose testRose3), -- caso Rose
+      (palabras .! procSubTries) testTrie ~=? concatMap palabras (procSubTries testTrie) -- caso Trie
+    ]
