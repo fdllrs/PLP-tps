@@ -590,5 +590,5 @@ testsEj8c =
       (procCola .! procVacio) testATNil ~=? [], -- caso vacio
       (inorder .! procHijosAT) testAT4 ~=? concatMap inorder (procHijosAT testAT4), -- caso AT
       (hojasRose .! procHijosRose) testRose3 ~=? concatMap hojasRose (procHijosRose testRose3), -- caso Rose
-      (palabras .! procSubTries) testTrie ~=? concatMap palabras (procSubTries testTrie) -- caso Trie
+      ((take 1) .! palabras) testTrie ~=? concatMap (take 1) (palabras testTrie) -- caso Trie
     ]
