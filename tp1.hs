@@ -562,9 +562,9 @@ testsEj8a =
     [ -- Casos de test para el ejercicio 8a
       ifProc True preorder postorder testATNil
         ~=? preorder testATNil, -- Caso Nil
-      ifProc (null procVacio) preorder postorder testAT2
+      ifProc True preorder postorder testAT2
         ~=? preorder testAT2, -- Caso True AT
-      ifProc (not (null procVacio)) preorder postorder testAT2
+      ifProc False preorder postorder testAT2
         ~=? postorder testAT2, -- Caso False AT
       ifProc False hojasRose ramasRose testRose3
         ~=? ramasRose testRose3, -- Caso RoseT
