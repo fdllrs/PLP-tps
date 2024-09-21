@@ -559,21 +559,36 @@ testsEj7 =
 
 testsEj8a =
   test
-    [ -- Casos de test para el ejercicio 7
-      True -- Caso de test 1 - expresión a testear
-        ~=? True -- Caso de test 1 - resultado esperado
+    [ -- Casos de test para el ejercicio 8a
+      ifProc True preorder postorder testATNil
+        ~=? preorder testATNil, -- Caso Nil
+      ifProc (null procVacio) preorder postorder testAT2
+        ~=? preorder testAT2, -- Caso True AT
+      ifProc (not (null procVacio)) preorder postorder testAT2
+        ~=? postorder testAT2, -- Caso False AT
+      ifProc False hojasRose ramasRose testRose3
+        ~=? ramasRose testRose3, -- Caso RoseT
+      ifProc True caminos palabras testTrie2
+        ~=? caminos testTrie2 -- Caso Trie
+
     ]
 
 testsEj8b =
   test
-    [ -- Casos de test para el ejercicio 7
-      True -- Caso de test 1 - expresión a testear
-        ~=? True -- Caso de test 1 - resultado esperado
+    [ -- Casos de test para el ejercicio 8b
+      (procVacio ++! preorder) testATNil ~=? [], -- Caso de test 1 : "Vacio y Vacio"
+      (preorder ++! postorder) testAT2 ~=? preorder testAT2 ++ postorder testAT2, -- Caso AT
+      (hojasRose ++! ramasRose) testRose2 ~=? hojasRose testRose2 ++ ramasRose testRose2, -- caso Rose
+      (caminos ++! palabras) testTrie2 ~=? caminos testTrie2 ++ palabras testTrie2 --caso Trie
+
     ]
 
 testsEj8c =
   test
-    [ -- Casos de test para el ejercicio 7
-      True -- Caso de test 1 - expresión a testear
-        ~=? True -- Caso de test 1 - resultado esperado
-    ]
+    [ -- Casos de test para el ejercicio 8c
+      ((\z->[0..z]) .! map (+1)) [1,3] ~=? [0,1,2,0,1,2,3,4], -- caso gratis
+      (procCola .! procVacio) testATNil ~=? [], -- caso vacio
+      (inorder .! procHijosAT) testAT4 ~=? , -- caso AT
+      (hojasRose .! procHijosRose) testRose3 ~=?, -- caso Rose
+      (palabras .! procSubTries) ~=?
+    ] -- faltan los rdos esperados
